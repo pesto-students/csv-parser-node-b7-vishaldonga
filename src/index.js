@@ -11,15 +11,15 @@ function parseCSVToJSON(
   const filePath = path.resolve(fileName);
   const rs = fs.createReadStream(filePath);
   const ws = new Transform();
+  let transformedChunk;
 
   rs.on("data", function (chunk) {
-    let transformedChunk = chunk
+    transformedChunk = chunk
       .toString()
       .replace(/(\r|\r\n|¬)/g, "")
       .split("\n");
 
     transformedChunk = transformedChunk.map((row) => row.split(delimiter));
-
     if (withHeader) {
       let headers = transformedChunk[0];
       if (headerTransformation !== null) {
@@ -37,7 +37,7 @@ function parseCSVToJSON(
       transformedChunk = resultArray;
     }
     ws.push(JSON.stringify(transformedChunk));
-  });
+  });  
   return ws;
 }
 
@@ -52,7 +52,7 @@ function parseJSONToCSV(fileName, delimiter) {
     csvFile = jsonData.map((row) => Object.values(row));
     csvFile.unshift(Object.keys(jsonData[0]));
     csvFile = `"${csvFile.join('"\n"').replace(/,/g, delimiter)}"`;
-    ws.push(JSON.stringify(csvFile));
+    ws.push(csvFile);
   });
   return ws;
 }
