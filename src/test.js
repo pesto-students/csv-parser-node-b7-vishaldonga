@@ -1,8 +1,8 @@
 const { parseCSVToJSON, parseJSONToCSV } = require("./index");
 
 
-const fileCSVName = "testcsv.csv"; //SampleCSVFile_2kb testcsv
-const fileJSONName = "testjson.json";
+const fileCSVName = "data/testcsv.csv"; //SampleCSVFile_2kb testcsv
+const fileJSONName = "data/testjson.json";
 
 
 console.log(parseCSVToJSON(fileCSVName, ",", false, null));
