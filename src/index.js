@@ -4,8 +4,8 @@ const { Transform } = require("stream");
 
 function parseCSVToJSON(
   fileName,
-  delimiter,
-  withHeader,
+  delimiter = ",",
+  withHeader = false,
   headerTransformation = null
 ) {
   const filePath = path.resolve(fileName);
@@ -37,11 +37,11 @@ function parseCSVToJSON(
       transformedChunk = resultArray;
     }
     ws.push(JSON.stringify(transformedChunk));
-  });  
+  });
   return ws;
 }
 
-function parseJSONToCSV(fileName, delimiter) {
+function parseJSONToCSV(fileName, delimiter = ",") {
   const filePath = path.resolve(fileName);
   const rs = fs.createReadStream(filePath);
   const ws = new Transform();
