@@ -2,6 +2,32 @@ const fs = require("fs");
 const path = require("path");
 const { Transform } = require("stream");
 
+function csvToJSON(
+  array,
+  delimiter = ",",
+  withHeader = false,
+  headerTransformation = null
+) {
+  let transformedChunk = array.map((row) => row.split(delimiter));
+  if (withHeader) {
+    let headers = transformedChunk[0];
+    if (headerTransformation !== null) {
+      headers = headerTransformation(headers);
+    }
+    transformedChunk = transformedChunk.slice(1);
+    let obj = {};
+    let resultArray = [];
+    for (const row of transformedChunk) {
+      row.map((data, col) => {
+        obj[headers[col]] = data;
+      });
+      resultArray.push(obj);
+    }
+    transformedChunk = resultArray;
+  }
+  return transformedChunk;
+}
+
 function parseCSVToJSON(
   fileName,
   delimiter = ",",
@@ -18,25 +44,13 @@ function parseCSVToJSON(
       .toString()
       .replace(/(\r|\r\n|¬)/g, "")
       .split("\n");
-
-    transformedChunk = transformedChunk.map((row) => row.split(delimiter));
-    if (withHeader) {
-      let headers = transformedChunk[0];
-      if (headerTransformation !== null) {
-        headers = headerTransformation(headers);
-      }
-      transformedChunk = transformedChunk.slice(1);
-      let obj = {};
-      let resultArray = [];
-      for (const row of transformedChunk) {
-        row.map((data, col) => {
-          obj[headers[col]] = data;
-        });
-        resultArray.push(obj);
-      }
-      transformedChunk = resultArray;
-    }
-    ws.push(JSON.stringify(transformedChunk));
+    const result = csvToJSON(
+      transformedChunk,
+      delimiter,
+      withHeader,
+      headerTransformation
+    );
+    ws.push(JSON.stringify(result));
   });
   return ws;
 }
